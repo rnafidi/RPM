@@ -1,0 +1,163 @@
+swagger: '2.0'
+info:
+  title: Post Investment Agreement status
+  version: 0.0.4
+  description: >-
+    Send Investment account information status after RPM Account change status
+schemes:
+  - http
+host: 'tbd:38000'
+basePath: /rpm/api/investmentAgreement/status
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  '/v1/InvestmentAgreement_Accounts_StatusType':
+   post:
+      summary: Post the investment agreement status
+      description: This method will post the new investment agreement status
+      operationId: Patch-investment-agreement-status
+      tags:
+        - InvestmentAgreement
+        - Post
+      produces:
+      - application/json
+      parameters:
+      - name: PostInvestmentAgreementStatusRequest
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/InvestmentAgreement_Accounts_StatusType'
+      - name: Authorization
+        in: header
+        description: >-
+          The OpenID Connect access token. The value is in the format: Bearer
+          access_token_value
+        required: true
+        type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/PostInvestmentAgreementStatusResponse'
+        '400':
+          description: 'Bad Request'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: 'Unauthorized'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: 'Internal Server Error'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+definitions:
+  InvestmentAgreement_Accounts_StatusType:
+    additionalProperties: false
+    properties:
+      InvestmentAgreementType:
+        additionalProperties: false
+        properties:
+          acctNo:
+            additionalProperties: false
+            description: Account number of the investment account
+            type: string
+          agmtSrcCd:
+            additionalProperties: false
+            type: string
+          agmtTypeCd:
+            additionalProperties: false
+            description: 'Investment agreement typesPossible Values : CI = Investment Account'
+            type: string
+          agreementLifeCycleStatusType:
+            additionalProperties: false
+            properties:
+              lifeCycleStatusTypeCd:
+                additionalProperties: false
+                description: 'Identifies if the investment account is active, closed, etc.'
+                type: string
+            required:
+              - lifeCycleStatusTypeCd
+            type: object
+          investmentAccountTypeInformationType:
+            additionalProperties: false
+            properties:
+              accountTypeCd:
+                additionalProperties: false
+                type: string
+            required:
+              - accountTypeCd
+            type: object
+          investmentAgmtEffctvDt:
+            additionalProperties: false
+            type: string
+            format: date
+          partyAgreementRltnpType:
+            additionalProperties: false
+            properties:
+              partyMemberType:
+                additionalProperties: false
+                properties:
+                  memberIdNo:
+                    additionalProperties: false
+                    type: string
+                  srcCd:
+                    additionalProperties: false
+                    enum:
+                      - 0068
+                      - '0641'
+                      - 0796
+                      - 0801
+                      - 0801_C
+                      - 0801_T
+                      - '2706'
+                      - '3127'
+                    type: string
+                required:
+                  - memberIdNo
+                  - srcCd
+                type: object
+              ptyAgmtRltnpTypeCd:
+                additionalProperties: false
+                enum:
+                  - DET/PRINC
+                type: string
+            required:
+              - partyMemberType
+              - ptyAgmtRltnpTypeCd
+            type: object
+          registeredAgmtFlg:
+            additionalProperties: false
+            description: Specifies if the investment acct is registered or not
+            type: string
+        required:
+         - acctNo
+          - agmtSrcCd
+        type: object
+    required:
+           - InvestmentAgreementType
+    type: object
+  PostInvestmentAgreementStatusResponse:
+    allOf:
+      - $ref: '#/definitions/response'
+      - type: object
+  ErrorResponse:
+    allOf:
+      - $ref: '#/definitions/response'
+      - type: object
+  response:
+    type: object
+    properties:
+      messages:
+        type: array
+        items:
+          $ref: '#/definitions/message'
+  message:
+    type: object
+    properties:
+      code:
+        type: string
+      description:
+        type: string

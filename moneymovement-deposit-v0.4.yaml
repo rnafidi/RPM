@@ -1,0 +1,411 @@
+swagger: '2.0'
+info:
+  title: Money Movement to Investment accounts
+  version: 0.0.4
+  description: >-
+    Send request to NBCTransfer for money movement from OP account to investment account
+schemes:
+  - https
+host: 'tbd:38000'
+basePath: /rpm/api/money/movement/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /deposit:
+    post:
+      summary: money movement deposit
+      operationId: deposit
+      description: send account information (FromAccount, ToAccount) for money movement
+      tags:
+        - Money Movement Deposit
+      parameters:
+        - name: moneyDepositRequest
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/moneyDepositRequest'
+        - name: Authorization
+          in: header
+          description: >-
+            The OpenID Connect access token. The value is in the format: Bearer
+            access_token_value
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/response'
+        '400':
+          description: 'Bad Request'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: 'Unauthorized'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: 'Internal Server Error'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+definitions:
+  moneyDepositRequest:
+    type: object
+    properties:
+      moneyMovmentType:
+        $ref: '#/definitions/financialInstructionType'
+    required:
+      - moneyMovmentType
+
+  agreementType:
+    type: object
+    properties:
+      acctNo:
+        type: string
+      agmtCurrencyCd:
+        type: string
+      agmtTypeCd:
+        type: string
+      agreementOrganizationUnitRltnpType:
+        type: object
+        properties:
+          orgUnitCd:
+            type: string
+        required:
+          - orgUnitCd
+      finLegalEntityCd:
+        type: string
+    required:
+      - acctNo
+      - agmtCurrencyCd
+      - agmtTypeCd
+      - agreementOrganizationUnitRltnpType
+      - finLegalEntityCd
+
+  bankingAccountAgreementType:
+    allOf:
+      - $ref: '#/definitions/agreementType'
+      - type: object
+        properties:
+          acctNo:
+            type: string
+          agmtCurrencyCd:
+            type: string
+          agmtTypeCd:
+            type: string
+          agreementOrganizationUnitRltnpType:
+            properties:
+              orgUnitCd:
+                type: string
+            required:
+              - orgUnitCd
+            type: object
+          finLegalEntityCd:
+            type: string
+
+  investmentAgreementType:
+    allOf:
+      - $ref: '#/definitions/agreementType'
+      - type: object
+        properties:
+          acctNo:
+            type: string
+          agmtCurrencyCd:
+            type: string
+          agmtTypeCd:
+            type: string
+          agreementOrganizationUnitRltnpType:
+            type: object
+            properties:
+              orgUnitCd:
+                type: string
+            required:
+              - orgUnitCd
+          finLegalEntityCd:
+            type: string
+          investmentAgreementCurrencyValueType:
+            type: object
+            properties:
+              currencyTypeCd:
+                type: string
+              currencyValue:
+                type: number
+            required:
+              - currencyTypeCd
+              - currencyValue
+        required:
+          - investmentAgreementCurrencyValueType
+
+  financialInstructionType:
+    type: object
+    properties:
+      bankingAccountAgreementType:
+        $ref: '#/definitions/bankingAccountAgreementType'
+      cNLType:
+        properties:
+          channelTypeCode:
+            type: string
+            enum:
+              - ACTCREA
+              - BUY
+              - PACCREA
+              - PACTERM
+              - SWITCH
+              - PROFUPD
+          cnlCode:
+            type: string
+        required:
+          - channelTypeCode
+          - cnlCode
+        type: object
+      financialInstructionId:
+        type: string
+      investmentAgreementType:
+        $ref: '#/definitions/investmentAgreementType'
+      moneyMovmentAmt:
+        type: number
+      moneyMovmentCurrencyCd:
+        type: string
+        enum:
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BOV
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYR
+          - BZD
+          - CAD
+          - CDF
+          - CHE
+          - CHF
+          - CHW
+          - CLF
+          - CLP
+          - CNY
+          - COP
+          - COU
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EEK
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LVL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MXV
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - STD
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - USN
+          - USS
+          - UYI
+          - UYU
+          - UZS
+          - VEF
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XBA
+          - XBB
+          - XBC
+          - XBD
+          - XCD
+          - XDR
+          - XFU
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - XTS
+          - YER
+          - ZAR
+          - ZMK
+          - ZWL
+      moneyMovmentTypeCd:
+        type: string
+      partyMemberType:
+        type: object
+        properties:
+          memberIdNo:
+            type: string
+          ptyTypeCd:
+            type: string
+            enum:
+              - 'E'
+              - 'GA'
+              - 'I'
+              - 'O'
+              - 'UA'
+          srcCd:
+            type: string
+            enum:
+              - '0068'
+              - '0641'
+              - '0796'
+              - '0801'
+              - '0801_C'
+              - '0801_T'
+              - '2706'
+              - '3127'
+        required:
+          - memberIdNo
+          - ptyTypeCd
+          - srcCd
+    required:
+      - bankingAccountAgreementType
+      - cNLType
+      - financialInstructionId
+      - investmentAgreementType
+      - moneyMovmentAmt
+      - moneyMovmentCurrencyCd
+      - moneyMovmentTypeCd
+      - partyMemberType
+
+  ErrorResponse:
+    allOf:
+      - $ref: '#/definitions/response'
+      - type: object
+
+  response:
+    type: object
+    properties:
+      messages:
+        type: array
+        items:
+          $ref: '#/definitions/message'
+
+  message:
+    type: object
+    properties:
+      code:
+        type: string
+      description:
+        type: string

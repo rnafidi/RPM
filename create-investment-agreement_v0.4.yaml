@@ -1,0 +1,478 @@
+swagger: '2.0'
+info:
+  title: Create Investment Agreement
+  version: 0.0.4
+  description: >-
+    Send Investment account information after RPM open Account
+schemes:
+  - https
+host: 'tbd:38000'
+basePath: /rpm/api/investment/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /{clientId}/agreement:
+    post:
+      summary: create an investment agreement
+      description: This method will create an investment agreement
+      operationId: create-investment-agreement
+      tags:
+        - Create Investment Agreement
+      produces:
+        - application/json
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          type: string
+        - name: CreateInvestmentAgreementRequest
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreateInvestmentAgreementRequest'
+        - name: Authorization
+          in: header
+          description: >-
+            The OpenID Connect access token. The value is in the format: Bearer
+            access_token_value
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/CreateInvestmentAgreementResponse'
+        '400':
+          description: 'Bad Request'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: 'Unauthorized'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: 'Internal Server Error'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    patch:
+      summary: update an investment agreement create status
+      description: This method will update the status of a create investment agreement request.
+      operationId: investment-agreement-status
+      tags:
+        - Investment Agreement Status
+      produces:
+        - application/json
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          type: string
+        - name: InvestmentAgreementStatusRequest
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/InvestmentAgreementStatusRequest'
+        - name: Authorization
+          in: header
+          description: >-
+            The OpenID Connect access token. The value is in the format: Bearer
+            access_token_value
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/InvestmentAgreementStatusResponse'
+        '400':
+          description: 'Bad Request'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '401':
+          description: 'Unauthorized'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: 'Internal Server Error'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+definitions:
+
+  CreateInvestmentAgreementRequest:
+    properties:
+      investmentAgreement:
+        required:
+          - acctNo
+          - advisor
+          - agmtBalAmt
+          - agmtSrcCd
+          - agmtTypeCd
+          - agreementLifeCycleStatus
+          - branch
+          - dealer
+          - financialMarketPosition
+          - investmentAgmtEffctvDt
+          - investmentAgmtEndDt
+          - investmentAgreementCurrencyValue
+          - investmentAgreementPlanInformation
+          - investmentCurrencyCd
+          - partyAgreementRltnp
+          - registeredAcctFlg
+          - registeredAgmtFlg
+        allOf:
+          - $ref: '#/definitions/investmentAgreement'
+          - type: object
+    required:
+      - investmentAgreement
+    type: object
+
+  InvestmentAgreementStatusRequest:
+    properties:
+      investmentAgreement:
+        required:
+          - acctNo
+          - agmtSrcCd
+          - agmtTypeCd
+          - registeredAgmtFlg
+          - investmentAgmtEffctvDt
+          - agreementLifeCycleStatus
+          - partyAgreementRltnp
+          - investmentAgreementPlanInformation
+        allOf:
+          - $ref: '#/definitions/investmentAgreement'
+          - type: object
+    required:
+      - investmentAgreement
+    type: object
+
+  investmentAgreement:
+    properties:
+      acctNo:
+        description: Account number of the investment account
+        type: string
+      advisor:
+        properties:
+          AdvisorCode:
+            type: string
+        required:
+          - AdvisorCode
+        type: object
+      agmtBalAmt:
+        type: number
+      agmtSrcCd:
+        type: string
+      agmtTypeCd:
+        description: >-
+          Investment agreement typesPossible Values : CI = Investment Account
+        type: string
+      agreementLifeCycleStatus:
+        $ref: '#/definitions/agreementLifeCycleStatus'
+      lifeCycleStatusTypeCd:
+        description: 'Identifies if the investment account is active closed, etc.'
+        type: string
+        enum:
+          - '0' # Active
+          - '1' # Terminated
+          - '2' # Annulled
+      branch:
+        properties:
+          orgUnitCPARegionCd:
+            type: string
+          orgUnitCd:
+            type: string
+          orgUnitTypeCd:
+            type: string
+        required:
+          - orgUnitCPARegionCd
+          - orgUnitCd
+          - orgUnitTypeCd
+        type: object
+      dealer:
+        properties:
+          orgUnitCd:
+            type: string
+          orgUnitTypeCd:
+            type: string
+            enum:
+              - 0  # Bank
+              - 1  # Credit Union
+              - 2  # Dealer Broker
+              - 4  # Insurance Company
+              - 5  # Intermidiary Trust
+              - 6  # Protection Agency
+              - 7  # Government Institution
+              - 8  # Custodian
+              - 9  # Self REgulatory Agency
+              - 10 # Securities Issuer
+        required:
+          - orgUnitCd
+          - orgUnitTypeCd
+        type: object
+      financialMarketPosition:
+        properties:
+          investmentPositionValue:
+            properties:
+              cashBalanceValue:
+                type: number
+              cashBlanceValueOrginalCurrency:
+                type: number
+            required:
+              - cashBalanceValue
+              - cashBlanceValueOrginalCurrency
+            type: object
+          positionEffctvDt:
+            type: string
+            format: date
+          positionEndDt:
+            type: string
+            format: date
+        required:
+          - investmentPositionValue
+          - positionEffctvDt
+          - positionEndDt
+        type: object
+      investmentAgmtEffctvDt:
+        type: string
+        format: date
+      investmentAgmtEndDt:
+        type: string
+        format: date
+      investmentAgreementCurrencyValue:
+        properties:
+          currencyTypeCd:
+            type: string
+          currencyValue:
+            type: number
+        required:
+          - currencyTypeCd
+          - currencyValue
+        type: object
+      investmentAgreementPlanInformation:
+        properties:
+          registeredPlanTypeCd:
+            description: >-
+              Further identifies what kind of registered plan the investment account is
+            type: string
+            enum:
+              - 1  # Brokerage
+              - 2  # RRSP
+              - 4  # RRIF
+              - 5  # RESP Inf
+              - 6  # RESP Fam
+              - 7  # DPSP
+              - 8  # RHOS
+              - 9  # Other
+              - 10  # LIFF
+              - 11 # LIRA
+              - 12 # LRIF
+              - 13 # RRTF
+              - 14 # PRTF
+              - 15 # RPP DBPPRPA
+              - 16 # RPP DCPPRPA
+              - 17 # TFSA
+              - 18 # RDSP
+              - 19 # RLIF
+              - 20 # RLSP
+              - 21 # IPP
+          spousalPlanFlg:
+            description: >-
+              0 (no); 1 (yes) - If yes idenitifes that a spousal contribution is made
+            type: string
+            enum:
+              - 0
+              - 1
+        required:
+          - registeredPlanTypeCd
+          - spousalPlanFlg
+        type: object
+      investmentCurrencyCd:
+        description: 'Can be "CAD", "USD"'
+        enum:
+          - CAD
+          - USD
+        type: string
+      partyAgreementRltnp:
+        properties:
+          AgmtOwnershipPct:
+            type: number
+          agmtPrimaryOwnerInd:
+            type: string
+          partyMember:
+            properties:
+              memberIdNo:
+                type: string
+              srcCd:
+                enum:
+                  - '0068'
+                  - '0641'
+                  - '0796'
+                  - '0801'
+                  - '0801_C'
+                  - '0801_T'
+                  - '2706'
+                  - '3127'
+                type: string
+            required:
+              - memberIdNo
+              - srcCd
+            type: object
+          ptyAgmtEffctvDt:
+            type: string
+            format: date
+          ptyAgmtEndDt:
+            type: string
+            format: date
+          ptyAgmtRltnpTypeCd:
+            enum:
+              - ASS/NDET
+              - ASSURE
+              - AT
+              - AUTRE
+              - B/CURAT
+              - B/EXECUT
+              - B/FIDEICO
+              - B/FIDUCIE
+              - B/MANDAT
+              - B/TUT/LEG
+              - B/TUTEUR
+              - BCP
+              - BEN/ASSRNC
+              - BENEFIC
+              - CAUTION
+              - CB
+              - CB/CURAT
+              - CB/EXECUT
+              - CB/FIDEICO
+              - CB/FIDUCIE
+              - CB/TUT/LEG
+              - CD
+              - CO/BENEF
+              - CO/DETENT
+              - CO/FIDEICO
+              - CO/SOUSCRP
+              - CODET
+              - CURAT
+              - CURATEUR
+              - DET/ASS/B
+              - DET/ASS/NB
+              - DET/CART/C
+              - DET/CARTE
+              - DET/NA/B
+              - DET/NA/NB
+              - DET/PRINC
+              - DET/UNIQUE
+              - DFI
+              - DU
+              - E
+              - EXEC/TEST
+              - EXECU
+              - FAB
+              - FID/??/BEN
+              - FID/AV/BEN
+              - FID/SA/BEN
+              - FIDUC
+              - FIDUC/??/B
+              - FIDUCIAIRE
+              - FININST
+              - FSB
+              - INCONNU
+              - INS
+              - MAND/INAPT
+              - MDM
+              - MI
+              - MT
+              - NOTAIRE
+              - P
+              - PAR/TUTEUR
+              - PROCUREUR
+              - RESP/ENF
+              - RESPONSBL
+              - S
+              - SIG
+              - SIGNAT
+              - SIGNATAIRE
+              - SOUSCRP
+              - ST
+              - SUCC
+              - SYNDIC
+              - TUT/CUR/SB
+              - TUT/CURAT
+              - TUTEU
+              - TUTEUR
+            type: string
+          ptyTypeCd:
+            enum:
+              - E  # Enterprise
+              - I  # Individual
+            type: string
+        required:
+          - AgmtOwnershipPct
+          - agmtPrimaryOwnerind
+          - agreementLifeCycleStatus
+          - partyMember
+          - ptyAgmtEffctvDt
+          - ptyAgmtEndDt
+          - ptyAgmtRltnpTypeCd
+          - ptyTypeCd
+        type: object
+      registeredAcctFlg:
+        type: string
+        description: >-
+          if '1' (yes) then registeredPlanTypeCd will indicate the accountType.
+        enum:
+          - 0 # no
+          - 1 # yes
+      registeredAgmtFlg:
+        description: Specifies if the investment acct is registered or not
+        type: string
+    type: object
+
+  agreementLifeCycleStatus:
+    properties:
+      lifeCycleStatusTypeCd:
+        description: 'Identifies if the investment account is active closed, etc.'
+        type: string
+        enum:
+          - '0' # Open
+          - '1' # Closed
+          - '2' # Pending
+          - '3' # Transfer in progress
+          - '4' # Dormant
+          - '5' # Pending Closed
+    required:
+      - lifeCycleStatusTypeCd
+    type: object
+
+  CreateInvestmentAgreementResponse:
+    allOf:
+      - $ref: '#/definitions/response'
+      - type: object
+
+  InvestmentAgreementStatusResponse:
+    allOf:
+      - $ref: '#/definitions/response'
+      - type: object
+
+  ErrorResponse:
+    allOf:
+      - $ref: '#/definitions/response'
+      - type: object
+
+  response:
+    type: object
+    properties:
+      messages:
+        type: array
+        items:
+          $ref: '#/definitions/message'
+
+  message:
+    type: object
+    properties:
+      code:
+        type: string
+      description:
+        type: string
